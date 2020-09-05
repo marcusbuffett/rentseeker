@@ -4,12 +4,12 @@ import { f1, f2, intersperse, mt, absolute, alignCenter, bg, border, br, column,
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useWindowSize } from "rooks";
-import { useSelector, useDispatch } from "react-redux";
 import { useModal } from "react-modal-hook";
 import { SignInForm } from "src/SignInForm";
 import { AppState } from "src/redux/reducer";
 import _ from "lodash";
 import { HouseUploadService } from "src/HouseUploadService";
+import { AppStore } from "src/store";
 
 const navItems = [
   {
@@ -26,11 +26,10 @@ export const AppContainer: FC<{}> = (props): ReactElement => {
   const router = useRouter();
   const { innerWidth } = useWindowSize();
   const mobile = innerWidth < 1000;
-  const dispatch = useDispatch();
   const [openSignIn, closeSignIn] = useModal(() => {
     return <SignInForm onClose={closeSignIn} />;
   });
-  const user = useSelector((state: AppState) => state.user);
+  const user = AppStore.useState((s) => s.user);
   const loggedIn = !_.isNil(user);
   return (
     <div style={s(column, pageHeight)}>

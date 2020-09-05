@@ -13,9 +13,10 @@ import {
   formatUSDShorten,
 } from "src/utilities";
 import { useWindowSize } from "rooks";
+import { AppStore } from "src/store";
 
 export default function Home() {
-  const investments = useSelector((state: AppState) => state.houses);
+  const investments = AppStore.useState((state) => state.houses);
   console.log("investments:", investments);
   const labelColor = light4;
   const { innerWidth } = useWindowSize();

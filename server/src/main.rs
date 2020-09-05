@@ -33,6 +33,7 @@ struct Claims {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 struct Investment {
     purchase_price: u32,
     uuid: String,

@@ -5,7 +5,7 @@ import { AppAction } from "src/redux/reducer";
 // prettier-ignore
 import {justifyEnd, justifyBetween, intersperse, Spacer, mt, absolute, alignCenter, bg, border, br, column, fullWidth, height, p, px, py, row, s, weightBold, width, noResize, justifyCenter, fg, fontSize, clickable, justifyStart, pl, pr, size, weightSemiBold, weightRegular, minWidth, mr, maxWidth, selfCenter, selfStretch, opacity, mb, light1, flexGrow, grow, pageHeight, dark4, dark3, dark5, light2, s6, full, f2, f3, caps, light3, light4, light5, flexWrap, dark2, s4, s3, hsl, f0, f1, selfEnd, alignEnd, alignStretch, keyedProp, inline, s5, alignStart, dark1, shadow, dark0, flexible, textAlign, s7, s8, s9, s10, selfStart, constrainWidth, center, light0, textOverflowClip, oneLine, stiff, modalContainer } from "src/styles";
 import superagent from "superagent";
-import { useDispatch } from "react-redux";
+import { AppStore } from "src/store";
 
 export const SignInForm = ({ onClose }) => {
   const ref = useRef(null);
@@ -23,7 +23,6 @@ export const SignInForm = ({ onClose }) => {
   );
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const dispatch = useDispatch();
   return (
     <div
       style={s(modalContainer)}
@@ -65,12 +64,9 @@ export const SignInForm = ({ onClose }) => {
                 .send({ email, password })
                 .end((err, res) => {
                   console.log("res:", res);
-                  dispatch({
-                    type: AppAction.Login,
-                    user: {
-                      email,
-                    },
-                    token: res.body.token,
+                  AppStore.update((s) => {
+                    s.jwt = res.body.token;
+                    s.user = { email };
                   });
                 });
             }}
@@ -85,12 +81,9 @@ export const SignInForm = ({ onClose }) => {
                 .post("/api/login")
                 .send({ email, password })
                 .end((err, res) => {
-                  dispatch({
-                    type: AppAction.Login,
-                    user: {
-                      email,
-                    },
-                    token: res.body.token,
+                  AppStore.update((s) => {
+                    s.jwt = res.body.token;
+                    s.user = { email };
                   });
                 });
             }}

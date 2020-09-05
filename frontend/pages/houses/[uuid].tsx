@@ -4,7 +4,6 @@ import _ from "lodash";
 // prettier-ignore
 import {justifyBetween, intersperse, Spacer, mt, absolute, alignCenter, bg, border, br, column, fullWidth, height, p, px, py, row, s, weightBold, width, noResize, justifyCenter, fg, fontSize, clickable, justifyStart, pl, pr, size, weightSemiBold, weightRegular, minWidth, mr, maxWidth, selfCenter, selfStretch, opacity, mb, light1, flexGrow, grow, pageHeight, dark4, dark3, dark5, light2, s6, full, f2, f3, caps, light3, light4, light5, flexWrap, dark2, s4, s3, hsl, f0, f1, selfEnd, alignEnd, alignStretch, keyedProp, inline, s5, alignStart, dark1, shadow, dark0, flexible, textAlign, s7, s8, s9, s10, selfStart, constrainWidth, center, light0, textOverflowClip, oneLine, stiff } from "src/styles";
 import { Investment, FieldFormat, FinancingOption } from "src/models";
-import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import {
   isSSR,
@@ -21,6 +20,7 @@ import { AppAction } from "src/redux/reducer";
 import { card, editableStyles, plColor, primaryColor } from "src/app_styles";
 import { Selector } from "src/Selector";
 import { useWindowSize } from "rooks";
+import { AppStore } from "src/store";
 
 const SliderGroup = ({ firstSlider, secondSlider, mobile }) => {
   if (mobile) {
@@ -44,8 +44,7 @@ const SliderGroup = ({ firstSlider, secondSlider, mobile }) => {
 export default function HousePage(props: {}): ReactElement {
   const router = useRouter();
   const uuid = router.query.uuid as string;
-  const dispatch = useDispatch();
-  const house = useSelector((state) =>
+  const house = AppStore.useState((state) =>
     _.find(state.houses, (house: Investment) => {
       return house.uuid === uuid;
     })
@@ -61,9 +60,10 @@ export default function HousePage(props: {}): ReactElement {
   const projection = createInvestmentProjection(house);
 
   const updateHouse = (house: Investment) => {
-    dispatch({
-      type: AppAction.UpdateInvestment,
-      house: house,
+    AppStore.update((s) => {
+      s.houses = _.map(s.houses, (h: Investment) => {
+        return h.uuid === house.uuid ? house : h;
+      });
     });
   };
   const labelColor = light4;
