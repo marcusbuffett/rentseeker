@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: house-calc
+spec:
+  ports:
+    - port: 3000
+  selector:
+    app: house-calc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: house-calc
+spec:
+  selector:
+    matchLabels:
+      app: house-calc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: house-calc
+    spec:
+      containers:
+        - image: marcusbuffett/house-calculator:latest
+          name: house-calc
+          ports:
+            - containerPort: 3000
+              name: house-calc
+      imagePullSecrets:
+        - name: docker-hub-secret-key
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: house-calc
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt
+    konghq.com/override: "https-only"
+spec:
+  tls:
+    - secretName: house-calc-tls
+      hosts:
+        - house-calc.mbuffett.com
+  rules:
+    - host: house-calc.mbuffett.com
+      http: &http_rules
+        paths:
+          - backend:
+              serviceName: house-calc
+              servicePort: 3000

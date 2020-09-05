@@ -1,0 +1,5 @@
+- TODO: just check every 15s and upload changed?
+- TODO: upload array of houses to investments endpoint? probably not needed, just functionize the update and map over
+- TODO: fetch investments on home page
+- TODO: spinner for buttons
+- TODO: incorrect password/username error handling, email exists error handling
