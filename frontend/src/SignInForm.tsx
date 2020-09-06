@@ -88,6 +88,9 @@ export const SignInForm = ({ onClose }) => {
                 .post("/api/login")
                 .send({ email, password })
                 .end((err, res) => {
+                  if (err) {
+                      e
+                  }
                   AppStore.update((s) => {
                     s.jwt = res.body.token;
                     s.user = { email };

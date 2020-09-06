@@ -15,6 +15,9 @@ export const editableStyles = s(
   br(2),
   // bg(createGray(13)),
   keyedProp("borderBottom")(`1px solid ${light5}`),
+  keyedProp("borderLeft")(`none`),
+  keyedProp("borderRight")(`none`),
+  keyedProp("borderTop")(`none`),
   clickable
 );
 

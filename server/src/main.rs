@@ -10,19 +10,18 @@ extern crate sled;
 
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
-use std::backtrace::Backtrace;
+// use std::backtrace::Backtrace;
 use std::option::NoneError;
 use thiserror::Error;
 
 use anyhow::anyhow;
 use anyhow::Context;
-use argon2::{self, Config};
+use argon2::{self};
 use rocket::fairing::AdHoc;
 use rocket::http::Status;
 use rocket::request::{self, FromRequest, Request};
 use rocket::Outcome;
 use rocket::State;
-use sled::Db;
 use sled_extensions::bincode::Tree;
 use sled_extensions::DbExt;
 
@@ -55,13 +54,13 @@ fn get_investments(db: State<Database>, user: User) -> anyhow::Result<Json<Vec<I
     let house_uuids = db
         .user_investments
         .get(user.email)?
-        .ok_or(anyhow!("No user investments"))?;
+        .ok_or_else(|| anyhow!("No user investments"))?;
     let mut houses: Vec<Investment> = vec![];
     for house_uuid in house_uuids {
         let house = db
             .houses
             .get(&house_uuid)?
-            .ok_or(anyhow!("No investment"))?;
+            .ok_or_else(|| anyhow!("No investment"))?;
         // let mut house: Investment = bincode::deserialize(&house)?;
         houses.push(house);
     }
@@ -76,7 +75,7 @@ pub enum ServerError {
     Unknown,
 }
 impl From<NoneError> for ServerError {
-    fn from(err: NoneError) -> Self {
+    fn from(_err: NoneError) -> Self {
         ServerError::Unknown
     }
 }
@@ -104,7 +103,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
 
 #[get("/investments/<uuid>")]
 fn get_investment(db: State<Database>, uuid: String) -> anyhow::Result<String> {
-    let house = db.houses.get(uuid)?.ok_or(anyhow!("BLAH"))?;
+    let house = db.houses.get(uuid)?.ok_or_else(|| anyhow!("BLAH"))?;
     let house = serde_json::to_string(&house)?;
     Ok(house)
 }
@@ -116,7 +115,7 @@ fn patch_investment(
     user: User,
 ) -> anyhow::Result<&'static str> {
     let house_uuids = db.user_investments.get(&user.email)?;
-    let mut house_uuids: Vec<String> = house_uuids.unwrap_or(vec![]);
+    let mut house_uuids: Vec<String> = house_uuids.unwrap_or_default();
     house_uuids.append(
         &mut houses
             .iter()
@@ -162,8 +161,8 @@ fn signup(
     let (hash, salt) = hash_credentials(&*credentials);
     let user = User {
         email: credentials.email.clone(),
-        hash: hash.clone(),
-        salt: salt.clone(),
+        hash,
+        salt,
     };
     db.users.insert(user.email.as_bytes(), user.clone())?;
     Ok(Json(AuthResponse {
@@ -178,7 +177,7 @@ fn hash_credentials(credentials: &Credentials) -> (String, String) {
     let salt = credentials.email.clone() + "r u salty";
     let hash =
         argon2::hash_encoded(&credentials.password.as_bytes(), &salt.as_bytes(), &config).unwrap();
-    return (hash, salt);
+    (hash, salt)
 }
 
 fn resolve_jwt(jwt: &str, db: &Database) -> anyhow::Result<User> {
@@ -188,14 +187,17 @@ fn resolve_jwt(jwt: &str, db: &Database) -> anyhow::Result<User> {
         &jsonwebtoken::Validation::default(),
     )
     .context("Failed to resolve JWT")?;
-    let user = db.users.get(claims.claims.email)?.ok_or(anyhow!("BLAH"))?;
+    let user = db
+        .users
+        .get(claims.claims.email)?
+        .ok_or_else(|| anyhow!("BLAH"))?;
     Ok(user)
 }
 
 fn create_jwt(user: User) -> anyhow::Result<String> {
     let now = chrono::Local::now();
     let claims = Claims {
-        email: user.email.clone(),
+        email: user.email,
         exp: (now + chrono::Duration::days(1)).timestamp() as usize,
     };
     jsonwebtoken::encode(
@@ -207,14 +209,28 @@ fn create_jwt(user: User) -> anyhow::Result<String> {
 }
 
 #[post("/login", data = "<credentials>")]
-fn login(db: State<Database>, credentials: Json<Credentials>) -> anyhow::Result<&'static str> {
-    Ok("Blah")
+fn login(
+    db: State<Database>,
+    credentials: Json<Credentials>,
+) -> anyhow::Result<Json<AuthResponse>> {
+    let (hash, _) = hash_credentials(&*credentials);
+    let user = db
+        .users
+        .get(&credentials.email)?
+        .ok_or_else(|| anyhow!("no user investments"))?;
+    if hash == user.hash {
+        Ok(Json(AuthResponse {
+            token: create_jwt(user)?,
+        }))
+    } else {
+        Err(anyhow!("hash doesn't match"))
+    }
 }
 
 fn launch_server() -> anyhow::Result<&'static str> {
     let path = "./data/sled";
     let db = sled_extensions::Config::default()
-        .path("./data/sled")
+        .path(path)
         .open()
         .expect("Failed to open sled db");
     let db_clone = db.clone();
