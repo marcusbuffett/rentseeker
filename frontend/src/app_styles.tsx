@@ -11,9 +11,10 @@ export const lossColor = hsl(0, 40, 50);
 
 export const editableStyles = s(
   py(s2),
-  px(s4),
+  // px(s4),
   br(2),
-  bg(createGray(13)),
+  // bg(createGray(13)),
+  keyedProp("borderBottom")(`1px solid ${light5}`),
   clickable
 );
 

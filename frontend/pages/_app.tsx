@@ -1,11 +1,15 @@
 import App from "next/app";
 import Head from "next/head";
 import { dark0, textDark, f0 } from "src/styles";
-import { wrapper } from "src/redux/reducer";
-import withRedux from "next-redux-wrapper";
 import { ModalProvider } from "react-modal-hook";
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import { enableMapSet } from "immer";
+import { useEffect } from "react";
 
 function MyApp({ Component, pageProps }) {
+  useEffect(() => {
+    enableMapSet();
+  }, []);
   return (
     <>
       <style jsx global>{`
@@ -208,4 +212,4 @@ function MyApp({ Component, pageProps }) {
 }
 
 //withRedux wrapper that passes the store to the App Component
-export default wrapper.withRedux(MyApp);
+export default MyApp;

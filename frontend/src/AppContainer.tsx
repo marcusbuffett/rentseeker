@@ -6,10 +6,11 @@ import Link from "next/link";
 import { useWindowSize } from "rooks";
 import { useModal } from "react-modal-hook";
 import { SignInForm } from "src/SignInForm";
-import { AppState } from "src/redux/reducer";
 import _ from "lodash";
 import { HouseUploadService } from "src/HouseUploadService";
 import { AppStore } from "src/store";
+import { PersistenceService } from "src/PersistenceService";
+import { HouseFetchService } from "src/HouseFetchService";
 
 const navItems = [
   {
@@ -29,11 +30,17 @@ export const AppContainer: FC<{}> = (props): ReactElement => {
   const [openSignIn, closeSignIn] = useModal(() => {
     return <SignInForm onClose={closeSignIn} />;
   });
-  const user = AppStore.useState((s) => s.user);
+  const user = AppStore.useState((s) => {
+    console.log("s.user:", s.user);
+    return s.user;
+  });
   const loggedIn = !_.isNil(user);
+  console.log("loggedIn:", loggedIn);
   return (
     <div style={s(column, pageHeight)}>
       <HouseUploadService />
+      <PersistenceService />
+      <HouseFetchService />
       <div
         style={s(
           height(80),
@@ -44,7 +51,16 @@ export const AppContainer: FC<{}> = (props): ReactElement => {
           px(s8)
         )}
       >
-        <div style={s(grow)}></div>
+        <div
+          style={s(grow, justifyStart, row, alignEnd, clickable)}
+          onClick={() => {
+            router.push("/");
+          }}
+        >
+          <img src="/logo.png" style={s(size(44))} />
+          <Spacer width={12} />
+          <div style={s(f2, fg(light4), mb(2))}>Rental calc</div>
+        </div>
         <div style={s(flexGrow(2), row, justifyCenter, alignCenter)}>
           {/*intersperse(
             navItems.map(({ name, path }) => {
@@ -91,7 +107,7 @@ export const AppContainer: FC<{}> = (props): ReactElement => {
             <div style={s(column, alignEnd)}>
               <div style={s(fg(light3))}>{user.email}</div>
               <Spacer height={s2} />
-              <div style={s(fg(light5))}>Real estate mogul</div>
+              <div style={s(fg(light5), f0)}>Real estate mogul</div>
             </div>
           ) : (
             <div
@@ -115,7 +131,7 @@ export const AppContainer: FC<{}> = (props): ReactElement => {
       </div>
       <div style={s(grow, bg(dark3), fg(light2), column)}>
         {mobile ? <Spacer height={12} /> : <Spacer height={s8} />}
-        <div style={s(full, maxWidth(1200), selfCenter, px(s7))}>
+        <div style={s(full, maxWidth(1200), selfCenter, px(s7), grow)}>
           {props.children}
         </div>
       </div>

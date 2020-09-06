@@ -6,7 +6,6 @@ import React, {
   useState,
 } from "react";
 import { inputStyles, primaryColor, secondaryColor } from "src/app_styles";
-import { AppAction, AppState } from "src/redux/reducer";
 import superagent from "superagent";
 import { useRequestAuth } from "src/useAuthenticatedRequester";
 import _ from "lodash";
@@ -24,16 +23,13 @@ export const HouseUploadService = ({}) => {
   useInterval(
     () => {
       if (!_.isEmpty(changedHouses)) {
-        _.forEach(changedHouses, (house) => {
-          // TODO: delete after successful
-          AppStore.update((s) => {
-            s.changed.delete(house.uuid);
-          });
-          requestAuth(superagent.post("/api/investments").send(house)).end(
-            (err, res) => {
-              console.log("res:", res);
-            }
-          );
+        AppStore.update((s) => {
+          s.changed.clear();
+        });
+        requestAuth(
+          superagent.post("/api/investments").send(changedHouses)
+        ).end((err, res) => {
+          console.log("res:", res);
         });
       }
     },

@@ -109,18 +109,25 @@ fn get_investment(db: State<Database>, uuid: String) -> anyhow::Result<String> {
     Ok(house)
 }
 
-#[post("/investments", data = "<house>")]
+#[post("/investments", data = "<houses>")]
 fn patch_investment(
     db: State<Database>,
-    house: Json<Investment>,
+    houses: Json<Vec<Investment>>,
     user: User,
 ) -> anyhow::Result<&'static str> {
     let house_uuids = db.user_investments.get(&user.email)?;
     let mut house_uuids: Vec<String> = house_uuids.unwrap_or(vec![]);
-    house_uuids.push(house.uuid.clone());
+    house_uuids.append(
+        &mut houses
+            .iter()
+            .map(|h| h.uuid.clone())
+            .collect::<Vec<String>>(),
+    );
     db.user_investments
         .insert(user.email.as_bytes(), house_uuids)?;
-    db.houses.insert(house.uuid.as_bytes(), house.clone())?;
+    for house in houses.iter() {
+        db.houses.insert(house.uuid.as_bytes(), house.clone())?;
+    }
     Ok("Blah")
 }
 

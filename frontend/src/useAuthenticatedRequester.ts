@@ -1,8 +1,7 @@
-import { AppState } from "src/redux/reducer";
-import { useSelector } from "react-redux";
+import { AppStore } from "src/store";
 
 export const useRequestAuth = () => {
-  const token = useSelector((state: AppState) => state.jwt);
+  const token = AppStore.useState((s) => s.jwt);
   return (req) => {
     req.set("Authorization", token);
     return req;

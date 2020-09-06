@@ -16,7 +16,6 @@ import {
 } from "src/utilities";
 import { Slider } from "src/Slider";
 import { AnnotatedSlider } from "src/AnnotatedSlider";
-import { AppAction } from "src/redux/reducer";
 import { card, editableStyles, plColor, primaryColor } from "src/app_styles";
 import { Selector } from "src/Selector";
 import { useWindowSize } from "rooks";
@@ -44,10 +43,13 @@ const SliderGroup = ({ firstSlider, secondSlider, mobile }) => {
 export default function HousePage(props: {}): ReactElement {
   const router = useRouter();
   const uuid = router.query.uuid as string;
-  const house = AppStore.useState((state) =>
-    _.find(state.houses, (house: Investment) => {
-      return house.uuid === uuid;
-    })
+  const house = AppStore.useState(
+    (state) => {
+      return _.find(state.houses, (house: Investment) => {
+        return house.uuid === uuid;
+      });
+    },
+    [uuid]
   );
   const { innerWidth } = useWindowSize();
   const mobile = innerWidth < 1000;
@@ -354,8 +356,16 @@ export default function HousePage(props: {}): ReactElement {
               Share
               <Spacer height={s5} />
               <div style={s(row, height(s8), alignStretch)}>
-                <div style={s(bg(light4), p(s4), grow, flexible, br(2))}>
-                  <div style={s(textOverflowClip, oneLine, fg(dark2))}>
+                <div style={s(bg(light4), p(s4), grow, flexible, br(2), row)}>
+                  <div
+                    style={s(
+                      textOverflowClip,
+                      oneLine,
+                      fg(dark4),
+                      row,
+                      alignCenter
+                    )}
+                  >
                     {window.location.href}
                   </div>
                 </div>

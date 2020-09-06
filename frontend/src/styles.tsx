@@ -67,9 +67,11 @@ export const hsla = (h, s, l, a) => {
 
 export const createGray = (lightness: number) => {
   const maxGraysSaturation = 12;
+  const minGraysSaturation = 8;
   return hsl(
     graysHue,
-    maxGraysSaturation - (lightness / 100) * maxGraysSaturation,
+    maxGraysSaturation -
+      (lightness / 100) * (maxGraysSaturation - minGraysSaturation),
     lightness
   );
 };
@@ -169,6 +171,7 @@ export const brl = (x) => {
 export const brr = (x) => s(brtr(x), brbr(x));
 export const maxWidth = keyedProp("maxWidth");
 export const minWidth = keyedProp("minWidth");
+export const minHeight = keyedProp("minHeight");
 export const constrainWidth = maxWidth("100%");
 export const clickable = keyedProp("cursor")("pointer");
 export const noBasis = keyedProp("flexBasis")(0);

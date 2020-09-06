@@ -1,8 +1,7 @@
 // prettier-ignore
-import {justifyBetween, intersperse, Spacer, mt, absolute, alignCenter, bg, border, br, column, fullWidth, height, p, px, py, row, s, weightBold, width, noResize, justifyCenter, fg, fontSize, clickable, justifyStart, pl, pr, size, weightSemiBold, weightRegular, minWidth, mr, maxWidth, selfCenter, opacity, mb, light1, flexGrow, grow, pageHeight, dark4, dark3, dark5, light2, s6, full, f2, f3, caps, light3, light4, light5, flexWrap, dark2, s4, s3, hsl, f0, f1, selfEnd, alignEnd, keyedProp, inline, s5, alignStart, dark1, shadow, dark0 } from "src/styles";
+import {justifyBetween, intersperse, Spacer, mt, absolute, alignCenter, bg, border, br, column, fullWidth, height, p, px, py, row, s, weightBold, width, noResize, justifyCenter, fg, fontSize, clickable, justifyStart, pl, pr, size, weightSemiBold, weightRegular, minWidth, mr, maxWidth, selfCenter, opacity, mb, light1, flexGrow, grow, pageHeight, dark4, dark3, dark5, light2, s6, full, f2, f3, caps, light3, light4, light5, flexWrap, dark2, s4, s3, hsl, f0, f1, selfEnd, alignEnd, keyedProp, inline, s5, alignStart, dark1, shadow, dark0, s7, center, s9, s10, mx, m, light0, minHeight } from "src/styles";
 import AppContainer from "src/AppContainer";
-import { Investment } from "src/models";
-import { useSelector } from "react-redux";
+import { createNewHouse, Investment } from "src/models";
 import { AppState } from "src/redux/reducer";
 import Link from "next/link";
 import { card, primaryColor, plColor } from "src/app_styles";
@@ -14,6 +13,9 @@ import {
 } from "src/utilities";
 import { useWindowSize } from "rooks";
 import { AppStore } from "src/store";
+import Loader from "react-loader-spinner";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const investments = AppStore.useState((state) => state.houses);
@@ -21,20 +23,32 @@ export default function Home() {
   const labelColor = light4;
   const { innerWidth } = useWindowSize();
   const mobile = innerWidth < 1000;
-  const gap = mobile ? 32 : 64;
+  const gap = 32;
+  const [loading, setLoading] = useState(false);
+  // TODO: fetch on load
+  useEffect(() => {}, []);
+  const router = useRouter();
+  const user = AppStore.useState((s) => s.user);
+  console.log("user:", user);
   return (
     <AppContainer>
-      <div style={s(f2, fg(light3), caps, weightBold)}>Houses</div>
+      {!mobile && <Spacer height={s7} />}
+      <div style={s(f2, fg(light4), caps, weightBold)}>Properties</div>
       <Spacer height={32} />
-      <div style={s(row, flexWrap, mt(-gap), justifyBetween)}>
-        {intersperse(
-          investments.map((investment) => {
+      {loading ? (
+        <div style={s(center, grow)}>
+          <Spacer height={s10} />
+          <Loader type="ThreeDots" color={light3} height={100} width={100} />
+        </div>
+      ) : (
+        <div style={s(row, flexWrap, m(-gap), justifyStart)}>
+          {investments.map((investment) => {
             const downTitleStyles = s(f3, inline, fg(light3));
             const downSubtitleStyles = s(f0, inline, fg(labelColor), caps);
             const projection = createInvestmentProjection(investment);
             return (
               <Link href="/houses/[uuid]" as={`/houses/${investment.uuid}`}>
-                <div style={s(p(s5), mt(gap), card, width(500), clickable)}>
+                <div style={s(p(s5), m(gap), card, width(500), clickable)}>
                   <div style={s(fg(light4), f1, weightRegular)}>
                     {investment.title}
                   </div>
@@ -92,12 +106,33 @@ export default function Home() {
                 </div>
               </Link>
             );
-          }),
-          (i) => (
-            <Spacer key={i} width={48} />
-          )
-        )}
-      </div>
+          })}
+          <div
+            style={s(
+              p(s5),
+              m(gap),
+              card,
+              width(500),
+              clickable,
+              bg(light4),
+              center,
+              minHeight(200),
+              shadow(2, 2, 0, 2, light5)
+            )}
+            onClick={() => {
+              AppStore.update((s) => {
+                let newHouse = createNewHouse();
+                s.houses.push(newHouse);
+                s.changed.add(newHouse.uuid);
+                // router.push("/houses/[uuid]", `/houses/${newHouse.uuid}`);
+              });
+            }}
+          >
+            <div style={s(fg(dark3), f2, weightSemiBold)}>New property</div>
+          </div>
+        </div>
+      )}
+      <Spacer height={gap + s9} />
     </AppContainer>
   );
 }

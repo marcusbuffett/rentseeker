@@ -1,19 +1,28 @@
+import localStorage from "local-storage";
 import { Store } from "pullstate";
 import { FinancingOption, Investment } from "src/models";
 
 export const AppStore = new Store<{
   houses: Investment[];
-  signInModalOpen: boolean;
   user: {
     email: string;
   };
   jwt: string;
+  fetchingInvestments: boolean;
+  fetchingInvestment: Set<string>;
   changed: Set<string>;
   deleted: Set<string>;
 }>({
+  fetchingInvestment: new Set(),
+  fetchingInvestments: false,
   changed: new Set(),
   deleted: new Set(),
+  // @ts-ignore
+  // user: localStorage("USER"),
+  // @ts-ignore
+  // jwt: localStorage("JWT"),
   user: null,
+  // @ts-ignore
   jwt: null,
   houses: [
     {

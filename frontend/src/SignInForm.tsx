@@ -1,7 +1,6 @@
 import { type } from "os";
 import React, { ReactElement, useRef, useState } from "react";
 import { inputStyles, primaryColor, secondaryColor } from "src/app_styles";
-import { AppAction } from "src/redux/reducer";
 // prettier-ignore
 import {justifyEnd, justifyBetween, intersperse, Spacer, mt, absolute, alignCenter, bg, border, br, column, fullWidth, height, p, px, py, row, s, weightBold, width, noResize, justifyCenter, fg, fontSize, clickable, justifyStart, pl, pr, size, weightSemiBold, weightRegular, minWidth, mr, maxWidth, selfCenter, selfStretch, opacity, mb, light1, flexGrow, grow, pageHeight, dark4, dark3, dark5, light2, s6, full, f2, f3, caps, light3, light4, light5, flexWrap, dark2, s4, s3, hsl, f0, f1, selfEnd, alignEnd, alignStretch, keyedProp, inline, s5, alignStart, dark1, shadow, dark0, flexible, textAlign, s7, s8, s9, s10, selfStart, constrainWidth, center, light0, textOverflowClip, oneLine, stiff, modalContainer } from "src/styles";
 import superagent from "superagent";
@@ -23,6 +22,7 @@ export const SignInForm = ({ onClose }) => {
   );
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const houses = AppStore.useState((s) => s.houses);
   return (
     <div
       style={s(modalContainer)}
@@ -68,6 +68,13 @@ export const SignInForm = ({ onClose }) => {
                     s.jwt = res.body.token;
                     s.user = { email };
                   });
+                  superagent
+                    .post("/api/investments")
+                    .send(houses)
+                    .set("Authorization", res.body.token)
+                    .end((req, res) => {
+                      console.log("res:", res);
+                    });
                 });
             }}
           >
