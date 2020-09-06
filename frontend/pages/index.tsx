@@ -19,7 +19,6 @@ import { useRouter } from "next/router";
 
 export default function Home() {
   const investments = AppStore.useState((state) => state.houses);
-  console.log("investments:", investments);
   const labelColor = light4;
   const { innerWidth } = useWindowSize();
   const mobile = innerWidth < 1000;
@@ -29,7 +28,6 @@ export default function Home() {
   useEffect(() => {}, []);
   const router = useRouter();
   const user = AppStore.useState((s) => s.user);
-  console.log("user:", user);
   return (
     <AppContainer>
       {!mobile && <Spacer height={s7} />}

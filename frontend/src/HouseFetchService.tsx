@@ -12,9 +12,7 @@ export const HouseFetchService = () => {
         s.fetchingInvestments = true;
       });
       requestAuth(superagent.get("/api/investments")).end((err, res) => {
-        console.log("res:", res);
         AppStore.update((s) => {
-          console.log("res.body:", res.body);
           s.houses = res.body;
         });
       });

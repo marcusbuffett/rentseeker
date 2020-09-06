@@ -31,11 +31,9 @@ export const AppContainer: FC<{}> = (props): ReactElement => {
     return <SignInForm onClose={closeSignIn} />;
   });
   const user = AppStore.useState((s) => {
-    console.log("s.user:", s.user);
     return s.user;
   });
   const loggedIn = !_.isNil(user);
-  console.log("loggedIn:", loggedIn);
   return (
     <div style={s(column, pageHeight)}>
       <HouseUploadService />

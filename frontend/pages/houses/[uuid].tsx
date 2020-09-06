@@ -79,7 +79,6 @@ export default function HousePage(props: {}): ReactElement {
   const houseUpdater = (field: string) => (x: number | string) => {
     let newHouse = _.cloneDeep(house);
     newHouse[field] = x;
-    console.log("newHouse:", newHouse);
     updateHouse(newHouse);
   };
   let ctaStyles = s(

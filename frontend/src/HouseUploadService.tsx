@@ -29,7 +29,6 @@ export const HouseUploadService = ({}) => {
         requestAuth(
           superagent.post("/api/investments").send(changedHouses)
         ).end((err, res) => {
-          console.log("res:", res);
         });
       }
     },

@@ -21,7 +21,6 @@ export const PersistenceService = ({}) => {
   useEffect(() => {
     const storedToken = localStorage(k);
     const storedUser = localStorage(userKey);
-    console.log("storedToken:", storedToken);
     // @ts-ignore
     if (!jwt && storedToken) {
       AppStore.update((s) => {
@@ -33,7 +32,6 @@ export const PersistenceService = ({}) => {
     }
   }, []);
   useEffect(() => {
-    console.log("jwt:", jwt);
     localStorage(k, jwt);
     localStorage(userKey, user);
   }, [jwt, user]);

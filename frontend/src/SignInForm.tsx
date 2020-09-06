@@ -63,7 +63,6 @@ export const SignInForm = ({ onClose }) => {
                 .post("/api/signup")
                 .send({ email, password })
                 .end((err, res) => {
-                  console.log("res:", res);
                   AppStore.update((s) => {
                     s.jwt = res.body.token;
                     s.user = { email };
@@ -73,7 +72,6 @@ export const SignInForm = ({ onClose }) => {
                     .send(houses)
                     .set("Authorization", res.body.token)
                     .end((req, res) => {
-                      console.log("res:", res);
                     });
                 });
             }}

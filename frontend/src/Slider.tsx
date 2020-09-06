@@ -37,7 +37,6 @@ export const Slider = ({
       <DraggableCore
         onStart={(e, { x }) => {
           setIsSliding(true);
-          console.log("x:", x);
           sliderUpdated(x);
         }}
         onDrag={(e, { x }) => {

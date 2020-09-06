@@ -39,25 +39,19 @@ export const AnnotatedSlider = ({
         <AutosizeInput
           value={editing ? editingValue : formatter(value)}
           onFocus={() => {
-            console.log("EDITING");
             setEditingValue(formatter(value));
             setEditing(true);
           }}
           onBlur={() => {
             setEditing(false);
-            console.log("NOT EDITING ANYMORE");
           }}
           onChange={(e) => {
             let val = e.target.value;
             setEditingValue(val);
-            console.log("val:", val);
             // val = val.match(/[\d.]+/)[0];
             val = val.replace(/[^0-9.]/g, "");
             let parsed = Number.parseFloat(val);
-            console.log("val:", val);
             if (!isNaN(parsed) && val !== "") {
-              console.log("DOING STUFF");
-              console.log(val);
               onValueChange(parsed);
             }
           }}
