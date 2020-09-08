@@ -11,6 +11,8 @@ extern crate sled;
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
 // use std::backtrace::Backtrace;
+use std::collections::HashSet;
+use std::env;
 use std::option::NoneError;
 use thiserror::Error;
 
@@ -34,7 +36,18 @@ struct Claims {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 struct Investment {
-    purchase_price: u32,
+    financing_option: String,
+    purchase_price: f64,
+    down_payment: f64,
+    interest_rate: f64,
+    rent: f64,
+    annual_taxes: f64,
+    insurance: f64,
+    expense_ratio: f64,
+    prop_management: f64,
+    misc_expenses: f64,
+    hoa: f64,
+    title: String,
     uuid: String,
 }
 
@@ -42,6 +55,7 @@ struct Database {
     houses: Tree<Investment>,
     users: Tree<User>,
     user_investments: Tree<Vec<String>>,
+    investment_users: Tree<String>,
 }
 
 #[get("/")]
@@ -102,10 +116,13 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
 }
 
 #[get("/investments/<uuid>")]
-fn get_investment(db: State<Database>, uuid: String) -> anyhow::Result<String> {
-    let house = db.houses.get(uuid)?.ok_or_else(|| anyhow!("BLAH"))?;
-    let house = serde_json::to_string(&house)?;
-    Ok(house)
+fn get_investment(db: State<Database>, uuid: String) -> anyhow::Result<Json<Investment>> {
+    let house = db
+        .houses
+        .get(uuid)?
+        .ok_or_else(|| anyhow!("Investment does not exist"))?;
+    // let house = serde_json::to_string(&house)?;
+    Ok(Json(house))
 }
 
 #[post("/investments", data = "<houses>")]
@@ -116,18 +133,41 @@ fn patch_investment(
 ) -> anyhow::Result<&'static str> {
     let house_uuids = db.user_investments.get(&user.email)?;
     let mut house_uuids: Vec<String> = house_uuids.unwrap_or_default();
-    house_uuids.append(
-        &mut houses
-            .iter()
-            .map(|h| h.uuid.clone())
-            .collect::<Vec<String>>(),
-    );
+    dbg!(house_uuids.clone());
+    let existing_house_uuids: HashSet<String> = house_uuids.clone().into_iter().collect();
+    dbg!(existing_house_uuids.clone());
+    let mut new_house_uuids: Vec<_> = houses
+        .iter()
+        .filter(|house| !existing_house_uuids.contains(&house.uuid))
+        .map(|h| h.uuid.clone())
+        .collect();
+    dbg!(new_house_uuids.clone());
+    new_house_uuids = new_house_uuids
+        .into_iter()
+        .filter(|new_house_uuid| {
+            let existing_owner = db.investment_users.get(new_house_uuid);
+            match existing_owner {
+                Ok(Some(_)) | Err(_) => false,
+                Ok(None) => db
+                    .investment_users
+                    .insert(new_house_uuid.as_bytes(), user.email.clone())
+                    .is_ok(),
+            }
+        })
+        .collect::<Vec<String>>();
+    // existing_house_uuids.
+    house_uuids.append(&mut new_house_uuids);
     db.user_investments
         .insert(user.email.as_bytes(), house_uuids)?;
     for house in houses.iter() {
         db.houses.insert(house.uuid.as_bytes(), house.clone())?;
     }
     Ok("Blah")
+}
+
+#[get("/health")]
+fn health_check() -> anyhow::Result<&'static str> {
+    Ok("Healthy")
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
@@ -164,15 +204,19 @@ fn signup(
         hash,
         salt,
     };
-    db.users.insert(user.email.as_bytes(), user.clone())?;
-    Ok(Json(AuthResponse {
-        token: create_jwt(user)?,
-        // token: "BLAH".to_string(),
-    }))
+    let existing_user = db.users.get(user.email.as_bytes())?;
+    if existing_user.is_some() {
+        Err(anyhow!("Existing user"))
+    } else {
+        db.users.insert(user.email.as_bytes(), user.clone())?;
+        Ok(Json(AuthResponse {
+            token: create_jwt(user)?,
+            // token: "BLAH".to_string(),
+        }))
+    }
 }
 
 fn hash_credentials(credentials: &Credentials) -> (String, String) {
-    let password = b"password";
     let config = argon2::Config::default();
     let salt = credentials.email.clone() + "r u salty";
     let hash =
@@ -228,7 +272,8 @@ fn login(
 }
 
 fn launch_server() -> anyhow::Result<&'static str> {
-    let path = "./data/sled";
+    // let path = "./data/sled";
+    let path = env::var("DB_PATH").unwrap_or("./data/sled".to_string());
     let db = sled_extensions::Config::default()
         .path(path)
         .open()
@@ -238,6 +283,7 @@ fn launch_server() -> anyhow::Result<&'static str> {
         houses: db.open_bincode_tree("houses")?,
         users: db.open_bincode_tree("users")?,
         user_investments: db.open_bincode_tree("user_investments")?,
+        investment_users: db.open_bincode_tree("investment_users")?,
     };
     rocket::ignite()
         .manage(db)
@@ -246,7 +292,15 @@ fn launch_server() -> anyhow::Result<&'static str> {
         }))
         .mount(
             "/api/",
-            routes![index, get_investments, patch_investment, signup, login],
+            routes![
+                index,
+                get_investments,
+                get_investment,
+                health_check,
+                patch_investment,
+                signup,
+                login
+            ],
         )
         .launch();
     Ok("blah")

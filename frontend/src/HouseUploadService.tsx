@@ -20,16 +20,16 @@ export const HouseUploadService = ({}) => {
   const changedHouses = _.filter(houses, (house) => {
     return changedHouseUuids.has(house.uuid);
   });
+  const jwt = AppStore.useState((s) => s.jwt);
   useInterval(
     () => {
-      if (!_.isEmpty(changedHouses)) {
+      if (!_.isEmpty(changedHouses) && jwt) {
         AppStore.update((s) => {
           s.changed.clear();
         });
         requestAuth(
           superagent.post("/api/investments").send(changedHouses)
-        ).end((err, res) => {
-        });
+        ).end((err, res) => {});
       }
     },
     1000,

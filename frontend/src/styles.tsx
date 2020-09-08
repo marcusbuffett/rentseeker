@@ -67,7 +67,7 @@ export const hsla = (h, s, l, a) => {
 
 export const createGray = (lightness: number) => {
   const maxGraysSaturation = 12;
-  const minGraysSaturation = 8;
+  const minGraysSaturation = 5;
   return hsl(
     graysHue,
     maxGraysSaturation -
@@ -80,6 +80,7 @@ export const light0 = createGray(99);
 export const light1 = createGray(96);
 export const light2 = createGray(93);
 export const light3 = createGray(84);
+export const light35 = createGray(77);
 export const light4 = createGray(70);
 export const light5 = createGray(50);
 
@@ -211,6 +212,7 @@ export const intersperse = <T,>(arr: T[], separator: (n: number) => T): T[] =>
     ];
   }, []);
 
+export const boxShadow = keyedProp("boxShadow");
 export const shadow = (x, y, blur, spread, color) => {
   return {
     boxShadow: `${x}px ${y}px ${blur}px ${spread}px ${color}`,
@@ -242,5 +244,6 @@ export const modalContainer = s(
   center,
   top(0),
   left(0),
-  bg(hsla(0, 0, 0, 50))
+  br(2),
+  bg(hsla(0, 0, 100, 30))
 );

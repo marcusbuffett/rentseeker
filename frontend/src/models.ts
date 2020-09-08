@@ -51,3 +51,23 @@ export const createNewHouse = () => {
     uuid: uuidv4(),
   };
 };
+
+export const createDefaultHouses = () => {
+  return [
+    {
+      title: "42 Example Property Rd.",
+      purchasePrice: 155000,
+      downPayment: 0.2,
+      interestRate: 0.045,
+      rent: 2125,
+      annualTaxes: 4000,
+      insurance: 400,
+      expenseRatio: 0.15,
+      financingOption: FinancingOption.Mortgage,
+      propManagement: 0.1,
+      hoa: 0,
+      miscExpenses: 0,
+      uuid: uuidv4(),
+    },
+  ];
+};

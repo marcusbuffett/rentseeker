@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps }) {
     <>
       <style jsx global>{`
         html {
-          line-height: 1.3; /* 1 */
+          line-height: 1.5; /* 1 */
           -webkit-text-size-adjust: 100%; /* 2 */
         }
 
@@ -95,7 +95,7 @@ function MyApp({ Component, pageProps }) {
         textarea {
           font-family: inherit; /* 1 */
           font-size: 100%; /* 1 */
-          line-height: 1.3; /* 1 */
+          line-height: 1.5; /* 1 */
           margin: 0; /* 2 */
         }
 
@@ -203,9 +203,19 @@ function MyApp({ Component, pageProps }) {
           color: ${textDark};
           font-size: ${f0};
         }
+        .input-light-placeholder::placeholder {
+          color: hsla(0, 0%, 100%, 30%);
+          opacity: 1;
+        }
       `}</style>
       <ModalProvider>
         <Component {...pageProps} />
+        <script
+          async
+          src="https://ackee.rentseeker.app/tracker.js"
+          data-ackee-server="https://ackee.rentseeker.app"
+          data-ackee-domain-id="9834b4ad-458d-41a8-96fd-db75d8c146b6"
+        ></script>
       </ModalProvider>
     </>
   );

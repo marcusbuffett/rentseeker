@@ -23,6 +23,7 @@ export const Selector = ({
           const active = choice === currentChoice;
           return (
             <div
+              key={choice}
               onClick={() => {
                 setChoice(choice);
               }}

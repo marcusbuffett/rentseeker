@@ -18,7 +18,7 @@ export const formatUSD = (x: number) => {
   let decimal = _.split((x % 1).toFixed(2), ".")[1];
   let withSeparators = Number(Math.abs(integralPart)).toLocaleString("EN-us");
   if (x < 0) {
-    return `$(${withSeparators})`;
+    return `($${withSeparators})`;
   }
   return `$${withSeparators}`;
 };

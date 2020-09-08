@@ -1,53 +1,53 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: house-calc
+  name: rentseeker
 spec:
   ports:
     - port: 3000
   selector:
-    app: house-calc
+    app: rentseeker
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: house-calc
+  name: rentseeker
 spec:
   selector:
     matchLabels:
-      app: house-calc
+      app: rentseeker
   replicas: 1
   template:
     metadata:
       labels:
-        app: house-calc
+        app: rentseeker
     spec:
       containers:
         - image: marcusbuffett/house-calculator:latest
-          name: house-calc
+          name: rentseeker
           ports:
             - containerPort: 3000
-              name: house-calc
+              name: rentseeker
       imagePullSecrets:
         - name: docker-hub-secret-key
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: house-calc
+  name: rentseeker
   annotations:
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt
     konghq.com/override: "https-only"
 spec:
   tls:
-    - secretName: house-calc-tls
+    - secretName: rentseeker-tls
       hosts:
-        - house-calc.mbuffett.com
+        - rentseeker.app
   rules:
-    - host: house-calc.mbuffett.com
+    - host: rentseeker.app
       http: &http_rules
         paths:
           - backend:
-              serviceName: house-calc
+              serviceName: rentseeker
               servicePort: 3000

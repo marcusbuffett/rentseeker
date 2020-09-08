@@ -1,6 +1,6 @@
 import React, { ReactElement, useState } from "react";
 // prettier-ignore
-import {round, left, top, justifyBetween, intersperse, Spacer, mt, absolute, relative, alignCenter, bg, border, br, column, fullWidth, height, p, px, py, row, s, weightBold, width, noResize, justifyCenter, fg, fontSize, clickable, justifyStart, pl, pr, size, weightSemiBold, weightRegular, minWidth, mr, maxWidth, selfCenter, opacity, mb, light1, flexGrow, grow, pageHeight, dark4, dark3, dark5, light2, s6, full, f2, f3, caps, light3, light4, light5, flexWrap, dark2, s4, s3, hsl, f0, f1, selfEnd, alignEnd, keyedProp, inline, s5, alignStart, dark1, shadow, dark0, transition, transform, dark6, my } from "src/styles";
+import {round, left, top, justifyBetween, intersperse, Spacer, mt, absolute, relative, alignCenter, bg, border, br, column, fullWidth, height, p, px, py, row, s, weightBold, width, noResize, justifyCenter, fg, fontSize, clickable, justifyStart, pl, pr, size, weightSemiBold, weightRegular, minWidth, mr, maxWidth, selfCenter, opacity, mb, light1, flexGrow, grow, pageHeight, dark4, dark3, dark5, light2, s6, full, f2, f3, caps, light3, light4, light5, flexWrap, dark2, s4, s3, hsl, f0, f1, selfEnd, alignEnd, keyedProp, inline, s5, alignStart, dark1, shadow, dark0, transition, transform, dark6, my, hsla } from "src/styles";
 import { DraggableCore } from "react-draggable";
 import useDimensions from "react-use-dimensions";
 import { primaryColor } from "src/app_styles";
@@ -49,7 +49,13 @@ export const Slider = ({
       >
         <div style={s(fullWidth, relative, clickable, py(s4))}>
           <div
-            style={s(fullWidth, bg(dark6), height(sliderHeight), round)}
+            style={s(
+              fullWidth,
+              bg(dark6),
+              height(sliderHeight),
+              round,
+              shadow(0, 4, 10, 1, hsla(0, 0, 0, 10))
+            )}
             ref={sliderWidthRef}
           ></div>
           <div
