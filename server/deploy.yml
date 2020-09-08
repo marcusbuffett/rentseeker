@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rentseeker-server
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: rentseeker-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rentseeker-server
+spec:
+  selector:
+    matchLabels:
+      app: rentseeker-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rentseeker-server
+    spec:
+      containers:
+        - image: marcusbuffett/rentseeker-server:latest
+          name: rentseeker-server
+          ports:
+            - containerPort: 80
+              name: main
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 10
+
+      imagePullSecrets:
+        - name: docker-hub-secret-key
+      volumes:
+        - name: rentseeker-persistent-storage
+          persistentVolumeClaim:
+            claimName: rentseeker-pv-claim
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: rentseeker-server
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt
+    konghq.com/override: "https-only"
+spec:
+  tls:
+    - secretName: rentseeker-server-tls
+      hosts:
+        - rentseeker.app
+  rules:
+    - host: rentseeker.app
+      http: &http_rules
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              serviceName: rentseeker-server
+              servicePort: 80
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rentseeker-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: do-block-storage
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rentseeker-pv-claim
+spec:
+  storageClassName: do-block-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
