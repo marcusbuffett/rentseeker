@@ -148,10 +148,7 @@ fn patch_investment(
             let existing_owner = db.investment_users.get(new_house_uuid);
             match existing_owner {
                 Ok(Some(_)) | Err(_) => false,
-                Ok(None) => db
-                    .investment_users
-                    .insert(new_house_uuid.as_bytes(), user.email.clone())
-                    .is_ok(),
+                Ok(None) => true,
             }
         })
         .collect::<Vec<String>>();
@@ -225,9 +222,10 @@ fn hash_credentials(credentials: &Credentials) -> (String, String) {
 }
 
 fn resolve_jwt(jwt: &str, db: &Database) -> anyhow::Result<User> {
+    let secret = env::var("SECRET").unwrap_or("DEV_SECRET".to_string());
     let claims = jsonwebtoken::decode::<Claims>(
         &jwt,
-        &jsonwebtoken::DecodingKey::from_secret("0f2baa54-c50b-484e-8bee-a21ac0fe1440".as_ref()),
+        &jsonwebtoken::DecodingKey::from_secret(secret.as_ref()),
         &jsonwebtoken::Validation::default(),
     )
     .context("Failed to resolve JWT")?;
@@ -244,10 +242,11 @@ fn create_jwt(user: User) -> anyhow::Result<String> {
         email: user.email,
         exp: (now + chrono::Duration::days(1)).timestamp() as usize,
     };
+    let secret = env::var("SECRET").unwrap_or("DEV_SECRET".to_string());
     jsonwebtoken::encode(
         &jsonwebtoken::Header::default(),
         &claims,
-        &jsonwebtoken::EncodingKey::from_secret("0f2baa54-c50b-484e-8bee-a21ac0fe1440".as_ref()),
+        &jsonwebtoken::EncodingKey::from_secret(secret.as_ref()),
     )
     .map_err(|_e| anyhow!("jwt creation failed"))
 }
@@ -303,7 +302,7 @@ fn launch_server() -> anyhow::Result<&'static str> {
             ],
         )
         .launch();
-    Ok("blah")
+    Ok("")
 }
 
 fn main() {

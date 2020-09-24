@@ -24,6 +24,7 @@ import AutosizeInput from "react-input-autosize";
 import superagent from "superagent";
 import * as copy from "copy-to-clipboard";
 import Head from "next/head";
+import AutoInput from "src/AutoInput";
 
 const SliderGroup = ({ firstSlider, secondSlider, mobile }) => {
   if (mobile) {
@@ -302,11 +303,11 @@ export default function HousePage(props: {}): ReactElement {
       <div style={s(column, fullWidth)}>
         <div style={s(row, mobile ? justifyStart : justifyCenter)}>
           <div style={s(selfCenter, fg(light3))}>
-            <AutosizeInput
+            <AutoInput
               ref={inputRef}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  inputRef.current.input.blur();
+                  inputRef.current.blur();
                 }
               }}
               value={editing ? editingValue : house.title}
@@ -324,8 +325,7 @@ export default function HousePage(props: {}): ReactElement {
                   houseUpdater("title")(val);
                 }
               }}
-              style={s()}
-              inputStyle={s(
+              style={s(
                 mobile ? f2 : f3,
                 fg(light3),
                 bg("transparent"),

@@ -28,6 +28,12 @@ spec:
           ports:
             - containerPort: 3000
               name: rentseeker
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 2
       imagePullSecrets:
         - name: docker-hub-secret-key
 ---

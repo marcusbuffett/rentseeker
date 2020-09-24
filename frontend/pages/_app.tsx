@@ -99,6 +99,10 @@ function MyApp({ Component, pageProps }) {
           margin: 0; /* 2 */
         }
 
+        input {
+          -webkit-appearance: none;
+        }
+
         * {
           box-sizing: border-box;
         }

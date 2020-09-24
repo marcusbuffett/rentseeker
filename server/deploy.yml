@@ -33,7 +33,7 @@ spec:
               path: /api/health
               port: 80
             initialDelaySeconds: 3
-            periodSeconds: 10
+            periodSeconds: 2
 
       imagePullSecrets:
         - name: docker-hub-secret-key

@@ -109,7 +109,9 @@ export const SignInForm = ({ onClose }) => {
                 .send({ email, password })
                 .end((err, res) => {
                   if (err) {
-                    console.log("err:", err);
+                    setError(
+                      "Error logging in. Please confirm your email and password are entered correctly."
+                    );
                   } else {
                     AppStore.update((s) => {
                       s.jwt = res.body.token;

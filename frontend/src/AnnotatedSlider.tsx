@@ -13,6 +13,7 @@ import {
 } from "src/utilities";
 import AutosizeInput from "react-input-autosize";
 import { usePrevious } from "rooks";
+import AutoInput from "src/AutoInput";
 
 export const AnnotatedSlider = ({
   formatter,
@@ -41,13 +42,13 @@ export const AnnotatedSlider = ({
     <div style={s(column, flex)}>
       <div style={s(row, justifyBetween, alignEnd)}>
         <div style={s(fg(light3), caps, f0)}>{field}</div>
-        <AutosizeInput
+        <AutoInput
           ref={inputRef}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               console.log("ENTER!");
               console.log("inputRef.current:", inputRef.current);
-              inputRef.current.input.blur();
+              inputRef.current.blur();
             }
           }}
           value={editing ? editingValue : formatter(value)}
@@ -75,7 +76,7 @@ export const AnnotatedSlider = ({
               }
             }
           }}
-          inputStyle={s(f2, fg(light3), bg("transparent"), editableStyles)}
+          style={s(f2, fg(light3), bg("transparent"), editableStyles)}
         />
       </div>
       <Spacer height={16} />

@@ -79,14 +79,13 @@ export const AppContainer: FC<{}> = (props): ReactElement => {
       <PersistenceService />
       <div
         style={s(
-          height(80),
+          height(100),
           bg(dark2),
           row,
           alignCenter,
           justifyCenter,
           boxShadow("0px 2px 10px 0px hsla(0, 0%, 0%, 0.2)"),
-          keyedProp("zIndex")(1),
-          px(mobile ? s6 : s8)
+          keyedProp("zIndex")(1)
         )}
       >
         <div style={s(selfCenter, row, maxWidth(1200), px(s8), fullWidth)}>

@@ -7,6 +7,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@juggle/resize-observer": "^3.2.0",
     "clipboard": "^2.0.6",
     "copy-to-clipboard": "^3.3.1",
     "immer": "^7.0.8",
@@ -23,6 +24,7 @@
     "react-modal-hook": "^3.0.0",
     "react-redux": "^7.2.1",
     "react-use-dimensions": "^1.2.1",
+    "react-use-measure": "^2.0.1",
     "redux": "^4.0.5",
     "rooks": "^3.6.0",
     "styled-components": "^5.0.0",
